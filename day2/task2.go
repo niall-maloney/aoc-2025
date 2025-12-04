@@ -30,6 +30,9 @@ func main() {
 			for i := start; i <= end; i++ {
 				id := strconv.Itoa(i)
 				for div := 2; div <= len(id); div++ {
+					if len(id)%div != 0 {
+						continue
+					}
 					if id == strings.Repeat(id[:len(id)/div], div) {
 						if !idcache[i] {
 							idcache[i] = true
