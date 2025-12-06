@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -31,18 +32,27 @@ func main() {
 			upper, _ := strconv.Atoi(strs[1])
 			ranges = append(ranges, &Range{lower, upper})
 		}
-		if len(strs) == 1 {
-			ingredient, _ := strconv.Atoi(strs[0])
-			fresh := false
-			for _, r := range ranges {
-				if r.lower <= ingredient && ingredient <= r.upper {
-					fresh = true
-				}
-			}
-			if fresh {
-				s++
+	}
+	sort.Slice(ranges, func(i, j int) bool { return ranges[i].lower < ranges[j].lower })
+
+	var fresh []*Range
+	for _, r := range ranges {
+		shouldAppend := true
+		for _, f := range fresh {
+			if f.lower <= r.lower && r.lower <= f.upper ||
+				f.lower <= r.upper && r.upper <= f.upper {
+				f.lower = min(f.lower, r.lower)
+				f.upper = max(f.upper, r.upper)
+				shouldAppend = false
 			}
 		}
+		if shouldAppend {
+			fresh = append(fresh, r)
+		}
+	}
+
+	for _, f := range fresh {
+		s += f.upper - f.lower + 1
 	}
 
 	fmt.Printf("%d\n", s)
