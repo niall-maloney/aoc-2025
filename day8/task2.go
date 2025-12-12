@@ -45,9 +45,7 @@ func main() {
 		y, _ := strconv.Atoi(strs[1])
 		z, _ := strconv.Atoi(strs[2])
 
-		p := JunctionBox{x, y, z}
-
-		junctionBoxes = append(junctionBoxes, p)
+		junctionBoxes = append(junctionBoxes, JunctionBox{x, y, z})
 	}
 
 	uf := newUnionFind(junctionBoxes)
