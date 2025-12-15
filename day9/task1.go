@@ -3,19 +3,15 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
+	"image"
 	"os"
 	"strconv"
 	"strings"
 )
 
-type Location struct {
-	x, y int
-}
-
 func main() {
-	s := 0
-	var locations []Location
+	var points []image.Point
+	var rectangles []image.Rectangle
 
 	file, err := os.Open("day9/task1.txt")
 	if err != nil {
@@ -23,6 +19,7 @@ func main() {
 	}
 	defer file.Close()
 
+	i := 0
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -30,19 +27,21 @@ func main() {
 
 		x, _ := strconv.Atoi(strs[0])
 		y, _ := strconv.Atoi(strs[1])
+		p := image.Point{X: x, Y: y}
 
-		locations = append(locations, Location{x, y})
+		for _, q := range points {
+			rectangles = append(rectangles, image.Rectangle{Min: p, Max: q}.Canon())
+		}
+		points = append(points, p)
+
+		i++
 	}
 
-	for i, a := range locations {
-		for j, b := range locations {
-			if i != j {
-				area := math.Abs(float64(a.x-b.x+1)) * math.Abs(float64(a.y-b.y+1))
-				if area > float64(s) {
-					s = int(area)
-				}
-			}
-		}
+	s := 0
+	for _, r := range rectangles {
+		r.Max = r.Max.Add(image.Point{X: 1, Y: 1})
+		area := r.Dx() * r.Dy()
+		s = max(s, area)
 	}
 
 	fmt.Printf("%d\n", s)
