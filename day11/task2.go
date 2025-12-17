@@ -29,13 +29,24 @@ func main() {
 		instructions[input] = Instruction{input, outputs}
 	}
 
-	s := countPath("you", instructions)
+	a := countPath("svr", "fft", instructions, map[string]int{})
+	a *= countPath("fft", "dac", instructions, map[string]int{})
+	a *= countPath("dac", "out", instructions, map[string]int{})
 
-	fmt.Printf("%d\n", s)
+	b := countPath("svr", "dac", instructions, map[string]int{})
+	b *= countPath("dac", "fft", instructions, map[string]int{})
+	b *= countPath("fft", "out", instructions, map[string]int{})
+
+	fmt.Printf("%d\n", a+b)
 }
 
-func countPath(current string, instructions map[string]Instruction) int {
-	if current == "out" {
+func countPath(current, target string, instructions map[string]Instruction, cache map[string]int) int {
+	count, exists := cache[current]
+	if exists {
+		return count
+	}
+
+	if current == target {
 		return 1
 	}
 
@@ -46,8 +57,10 @@ func countPath(current string, instructions map[string]Instruction) int {
 
 	total := 0
 	for _, next := range instruction.outputs {
-		total += countPath(next, instructions)
+		total += countPath(next, target, instructions, cache)
 	}
+
+	cache[current] = total
 
 	return total
 }
